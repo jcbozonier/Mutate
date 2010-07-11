@@ -10,10 +10,6 @@ namespace SampleCodeTests
     [TestFixture]
     public class FooTests
     {
-        /// <summary>
-        /// Hasn't been ran yet... assuming it works for now
-        /// really just checking this in to see if GitHub can see who I am ;)
-        /// </summary>
         [Test]
         public void FooTest1()
         {
