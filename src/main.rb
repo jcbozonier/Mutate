@@ -30,16 +30,16 @@ class CodeUnderTest
     @compiler_path = 'C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\msbuild.exe'
   end
 
-  def test(to_do)
+  def test(what_to_do)
     system @compiler_path, @build_path
     system @test_runner, @test_command, "/xml:#{@test_results_path}"
     test_results_file = File.open(@test_results_path, 'r')
     tests_passed = test_results_file.read.include? 'failures="0"'
     
     if tests_passed
-      to_do[:when_tests_pass].call
+      what_to_do[:when_tests_pass].call
     else
-      to_do[:when_tests_fail].call
+      what_to_do[:when_tests_fail].call
     end
   end
 end
