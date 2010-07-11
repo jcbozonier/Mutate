@@ -13,4 +13,6 @@ PatchEntry.dll
 PatchStub.exe
 Milliman.MGAlfa.Packaging.dll
 *.sln.cache
-Releasesf
+*.swp
+*.rb~
+TestWorkingFolder
