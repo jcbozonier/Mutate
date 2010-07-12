@@ -50,14 +50,24 @@ class MutationProcess
   end
 
   def start
-    @working_folder.reset
-    # MUTATE CODE HERE
-    @after_mutation_test.test do |mutation_test_result|
-      case mutation_test_result
-        when :tests_passed then @test_report.code_mutated_but_tests_pass
-	when :tests_failed then @test_report.code_mutated_and_tests_failed
+    tests_pass = false
+    testing_done = false
+    begin
+      @working_folder.reset
+
+      # MUTATE CODE HERE
+
+      @after_mutation_test.test do |mutation_test_result|
+        case mutation_test_result
+          when :tests_passed 
+            @test_report.code_mutated_but_tests_pass
+            tests_pass = true
+          when :tests_failed
+            @test_report.code_mutated_and_tests_failed
+            testing_done = true
+        end
       end
-    end
+    end until tests_pass or testing_done
   end
 end
 
