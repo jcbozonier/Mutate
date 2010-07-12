@@ -55,7 +55,8 @@ class MutationProcess
     @after_mutation_test.test do |mutation_test_result|
       case mutation_test_result
         when :tests_passed then @test_report.code_mutated_but_tests_pass
-	when :tests_failed then @test_report.code_mutated_and_tests_failed            end
+	when :tests_failed then @test_report.code_mutated_and_tests_failed
+      end
     end
   end
 end
