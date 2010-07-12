@@ -30,27 +30,64 @@ class CodeUnderTest
     @compiler_path = 'C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\msbuild.exe'
   end
 
-  def test(what_to_do_afterwards)
+  def test
     system @compiler_path, @build_path
     system @test_runner, @test_command, "/xml:#{@test_results_path}"
     test_results_file = File.open(@test_results_path, 'r')
     tests_passed = test_results_file.read.include? 'failures="0"'
-    
-    if tests_passed
-      what_to_do_afterwards[:when_tests_pass].call
-    else
-      what_to_do_afterwards[:when_tests_fail].call
+    test_results_file.close 
+
+    yield :tests_passed if tests_passed
+    yield :tests_failed if !tests_passed
+  end
+end
+
+class MutationProcess
+  def initialize working_folder, after_mutation_test, test_report
+    @working_folder = working_folder
+    @after_mutation_test = after_mutation_test
+    @test_report = test_report
+  end
+
+  def start
+    @working_folder.reset
+    # MUTATE CODE HERE
+    @after_mutation_test.test do |mutation_test_result|
+      case mutation_test_result
+        when :tests_passed then @test_report.code_mutated_but_tests_pass
+	when :tests_failed then @test_report.code_mutated_and_tests_failed            end
     end
   end
 end
 
+class TestReport
+  def baseline_test_failed
+    puts 'Baseline tests on golden code failed. Mutation testing can not begin.' 
+  end
 
+  def code_mutated_but_tests_pass
+    puts 'Mutation but no failing test!'
+  end
+
+  def code_mutated_and_tests_failed
+    puts 'Test failed after mutation.'
+  end
+end
+
+test_report = TestReport.new
 working_folder = WorkingFolder.new golden_copy_path, working_folder_path
 baseline_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
+after_mutation_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
+mutation_process = MutationProcess.new working_folder, after_mutation_test, test_report 
 
 working_folder.reset
-baseline_test.test(
-  {
-    :when_tests_pass=>lambda{puts "tests passed!"}, 
-    :when_tests_fail=>lambda{puts "tests failed!"}
-  })
+baseline_test.test do |baseline_test_result|
+  case baseline_test_result
+    when :tests_passed then 
+      mutation_process.start
+    when :tests_failed then 
+      test_report.baseline_test_failed
+  end
+end
+
+
