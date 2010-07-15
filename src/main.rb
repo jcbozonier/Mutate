@@ -42,35 +42,6 @@ class CodeUnderTest
   end
 end
 
-class MutationProcess
-  def initialize working_folder, after_mutation_test, test_report
-    @working_folder = working_folder
-    @after_mutation_test = after_mutation_test
-    @test_report = test_report
-  end
-
-  def start
-    tests_pass = false
-    testing_done = false
-    begin
-      @working_folder.reset
-
-      # MUTATE CODE HERE
-
-      @after_mutation_test.test do |mutation_test_result|
-        case mutation_test_result
-          when :tests_passed 
-            @test_report.code_mutated_but_tests_pass
-            tests_pass = true
-          when :tests_failed
-            @test_report.code_mutated_and_tests_failed
-            testing_done = true
-        end
-      end
-    end until tests_pass or testing_done
-  end
-end
-
 class TestReport
   def baseline_test_failed
     puts 'Baseline tests on golden code failed. Mutation testing can not begin.' 
@@ -85,20 +56,44 @@ class TestReport
   end
 end
 
-test_report = TestReport.new
-working_folder = WorkingFolder.new golden_copy_path, working_folder_path
-baseline_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
-after_mutation_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
-mutation_process = MutationProcess.new working_folder, after_mutation_test, test_report 
+class TextFile
+  def initialize output
+    @output = output
+  end
 
-working_folder.reset
-baseline_test.test do |baseline_test_result|
-  case baseline_test_result
-    when :tests_passed then 
-      mutation_process.start
-    when :tests_failed then 
-      test_report.baseline_test_failed
+  def read file_path
+    File.open(file_path, 'r') do |line_from_file|
+      while (current_line = line_from_file.gets)
+        @output.next current_line
+      end
+    end
   end
 end
 
+class TokenFile
+  def initialize output_channel
+    @output_channel = output_channel
+  end
 
+  def next data
+    @output_channel.next :comment
+  end
+end
+
+if __FILE__ == $0
+  test_report = TestReport.new
+  working_folder = WorkingFolder.new golden_copy_path, working_folder_path
+  baseline_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
+  after_mutation_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
+
+  working_folder.reset
+  baseline_test.test do |baseline_test_result|
+    case baseline_test_result
+    when :tests_passed then 
+      puts "Tests passed!"
+    when :tests_failed then 
+      test_report.baseline_test_failed
+    end
+  end
+
+end
