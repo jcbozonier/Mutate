@@ -33,9 +33,14 @@ class CodeUnderTest
   def test
     system @compiler_path, @build_path
     system @test_runner, @test_command, "/xml:#{@test_results_path}"
-    test_results_file = File.open(@test_results_path, 'r')
-    tests_passed = test_results_file.read.include? 'failures="0"'
-    test_results_file.close 
+
+    tests_passed = false
+
+    if File.exists?(@test_results_path)
+      test_results_file = File.open(@test_results_path, 'r')
+      tests_passed = test_results_file.read.include?('failures="0"')
+      test_results_file.close 
+    end
 
     yield :tests_passed if tests_passed
     yield :tests_failed if !tests_passed
@@ -73,10 +78,15 @@ end
 class TokenFile
   def initialize output_channel
     @output_channel = output_channel
+    @character_list = ''
   end
 
   def next data
-    @output_channel.next :comment
+    @character_list += data
+  end
+
+  def done
+    @output_channel.next :comment if @character_list == '//'
   end
 end
 

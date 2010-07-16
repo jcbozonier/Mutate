@@ -1,16 +1,46 @@
 require 'main.rb'
 
-describe "When receiving a comment" do
+describe "When receiving an indeterminate character" do
   before(:each) do
     @output_channel = OutputChannel.new
     token_file = TokenFile.new @output_channel
 
-    token_file.next "// testing"
+    token_file.next "/"
+
   end
   
-  it "should pass the appropriate token onward" do
-    @output_channel.data.should == :comment
+  it "should NOT pass a token onward" do
+    @output_channel.data.should == nil 
   end 
+end
+
+describe "When receiving characters that define a comment but not done" do
+  before(:each) do
+    @output_channel = OutputChannel.new
+    token_file = TokenFile.new @output_channel
+
+    token_file.next "/"
+    token_file.next "/"
+  end
+  
+  it "should NOT pass a token onward" do
+    @output_channel.data.should == nil 
+  end 
+end
+
+describe "When receiving characters that define a complete comment" do
+  before(:each) do
+    @output_channel = OutputChannel.new
+    token_file = TokenFile.new @output_channel
+
+    token_file.next "/"
+    token_file.next "/"
+    token_file.done
+  end
+
+  it "should pass a comment token onward" do
+    @output_channel.data.should == :comment
+  end
 end
 
 class OutputChannel
