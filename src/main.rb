@@ -79,14 +79,45 @@ class TokenFile
   def initialize output_channel
     @output_channel = output_channel
     @character_list = ''
+    @current_token = :none
   end
 
-  def next data
-    @character_list += data
+  def next *args
+    for data in args
+      self.done if data == Literals.newline
+
+      @character_list += data
+      @current_token = :comment if @character_list == Literals.comment_literal
+    end
   end
 
   def done
-    @output_channel.next :comment if @character_list == '//'
+    if @current_token == :comment
+      @output_channel.next Comment.new @character_list
+    end
+  end
+end
+
+class Literals
+  def self.comment_literal
+    "//"
+  end
+  def self.newline
+    '\n'
+  end
+end
+
+class Comment
+  def initialize comment_text
+    @comment_text = comment_text
+  end
+
+  def comment_text
+    @comment_text
+  end
+
+  def ==(another_comment)
+    @comment_text == another_comment.comment_text
   end
 end
 
