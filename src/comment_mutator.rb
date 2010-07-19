@@ -65,13 +65,13 @@ end
 
 class LineCommentingMutationController
   def initialize writer, tester, working_folder
-    @line_counter = 0
     @writer = writer
     @tester = tester
     @working_folder = working_folder
   end
   
   def next_file relative_file_path
+    @line_counter = 0
     @file = relative_file_path
   end
   
@@ -118,9 +118,11 @@ class LineWriteableTextFile
 
   def write file_name, line_number, text  
     writeable_path = File.join(@root_path, file_name)
-    lines_of_text = File.open(writeable_path, 'r').readlines
-    writeable_file = File.new(writeable_path, 'w')
+    readable_file = File.open(writeable_path, 'r')
+    lines_of_text = readable_file.readlines
+    readable_file.close
     
+    writeable_file = File.new(writeable_path, 'w')
     current_line_number = 0
     for line in lines_of_text
       current_line_number += 1
@@ -130,25 +132,8 @@ class LineWriteableTextFile
         writeable_file.puts line
       end
     end
-  end
-end
-
-class WriteableTextFile
-  def initialize file_name
-    @file_name = file_name
-    @file = nil
-  end
-  
-  def write line
-    if @file == nil
-      @file = File.new @file_name, 'w'
-    end
+    writeable_file.close
     
-    @file.puts line
-  end
-  
-  def close
-    @file.close if @file != nil
   end
 end
 
@@ -156,23 +141,24 @@ class TestRunner
   def initialize test, report_path
     @test = test
     @report_path = report_path
-    @report_file = File.open(File.join(@report_path, "mutation_report.txt"), 'w')
+    @report = File.new(@report_path + "\\mutation_report.txt", 'w')
   end
   
   def next data
     puts data
+    
     @test.test do |baseline_test_result|
       case baseline_test_result
         when :tests_passed then 
-          @report_file.puts "#{data} Passed! BAD BAD BAD >:("
+          @report.puts "#{data} Passed! BAD BAD BAD >:("
         when :tests_failed then 
-          @report_file.puts "#{data} Failed! Good. :)"
+          @report.puts "#{data} Failed! Good. :)"
       end
     end
   end
   
   def done
-    @report_file.close
+    @report.close
   end
 end
 
