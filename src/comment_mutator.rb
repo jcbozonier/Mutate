@@ -17,6 +17,7 @@ class WorkingFolder
   
   def reset
     rm_rf @working_folder_path if File.directory? @working_folder_path
+    puts @working_folder_path
     mkdir @working_folder_path
     cp_r @golden_copy_path + '\\.', @working_folder_path
   end
@@ -48,39 +49,26 @@ class CodeUnderTest
   end
 end
 
-class TestReport
-  def baseline_test_failed
-    puts 'Baseline tests on golden code failed. Mutation testing can not begin.' 
-  end
-
-  def code_mutated_but_tests_pass
-    puts 'Mutation but no failing test!'
-  end
-
-  def code_mutated_and_tests_failed
-    puts 'Test failed after mutation.'
-  end
-end
-
 class ReadableTextFile
   def initialize output
     @output = output
   end
 
   def read file_path
-    File.open(file_path, 'r') do |line_from_file|
-      while (current_line = line_from_file.gets)
-        @output.next current_line
-      end
+    lines_from_file = File.open(file_path, 'r').readlines
+    
+    for line_from_file in lines_from_file
+      @output.next line_from_file
     end
   end
 end
 
 class LineCommentingMutationController
-  def initialize writer, tester
+  def initialize writer, tester, working_folder
     @line_counter = 0
     @writer = writer
     @tester = tester
+    @working_folder = working_folder
   end
   
   def next_file relative_file_path
@@ -90,10 +78,15 @@ class LineCommentingMutationController
   def next text
     @line_counter += 1
     if text.strip != ""
+      @working_folder.reset
       @writer.write(@file, @line_counter, "//" + text)
       @tester.next "#{@file}, #{@line_counter}, #{text}"
     end
   end
+  
+  def done
+    @tester.done
+  end 
 end
 
 class RecursivelyFindCodeFilesInFolder
@@ -104,14 +97,17 @@ class RecursivelyFindCodeFilesInFolder
   end
   
   def start
+    file_paths = nil
     Dir.chdir(@path) do
-      file_paths = File.join("**", "*.cs")
-      
-      for relative_file_path in Dir.glob(file_paths) 
-        @mutation_controller.next_file relative_file_path
-        @file_reader.read File.join(@path, relative_file_path)
-      end
+      file_paths = Dir.glob(File.join("**", "*.cs"))
     end
+    
+    for relative_file_path in file_paths
+      @mutation_controller.next_file relative_file_path
+      @file_reader.read File.join(@path, relative_file_path)
+    end
+   
+    @mutation_controller.done
   end
 end
 
@@ -156,76 +152,27 @@ class WriteableTextFile
   end
 end
 
-class TokenFile
-  def initialize output_channel
-    @output_channel = output_channel
-    @character_list = ''
-    @current_token = :none
-  end
-
-  def next *args
-    for data in args
-      self.done if data == Literals.newline
-
-      @character_list += data
-      @current_token = :comment if @character_list == Literals.comment_literal
-    end
-  end
-
-  def done
-    if @current_token == :comment
-      @output_channel.next Comment.new @character_list
-    end
-  end
-end
-
-class Literals
-  def self.comment_literal
-    "//"
-  end
-  def self.newline
-    '\n'
-  end
-end
-
-class Comment
-  def initialize comment_text
-    @comment_text = comment_text
-  end
-
-  def comment_text
-    @comment_text
-  end
-
-  def ==(another_comment)
-    @comment_text == another_comment.comment_text
-  end
-end
-
-class OutputChannel
-  def next_file input
-    puts input
-  end
-end
-
 class TestRunner
-  def initialize test, working_folder
+  def initialize test, report_path
     @test = test
-    @working_folder = working_folder
+    @report_path = report_path
+    @report_file = File.open(File.join(@report_path, "mutation_report.txt"), 'w')
   end
   
   def next data
     puts data
-  
-    @working_folder.reset
     @test.test do |baseline_test_result|
       case baseline_test_result
         when :tests_passed then 
-          puts "#{data} Passed! BAD BAD BAD >:("
+          @report_file.puts "#{data} Passed! BAD BAD BAD >:("
         when :tests_failed then 
-          puts "#{data} Failed! Good. :)"
+          @report_file.puts "#{data} Failed! Good. :)"
       end
     end
+  end
+  
+  def done
+    @report_file.close
   end
 end
 
@@ -233,36 +180,18 @@ if __FILE__ == $0
   working_folder = WorkingFolder.new golden_copy_path, working_folder_path
   baseline_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
   
-  tester = TestRunner.new baseline_test, working_folder
+  tester = TestRunner.new baseline_test, "C:\\Code\\MutationTesting\\"
   writer = LineWriteableTextFile.new File.join(working_folder_path, code_to_mutate)
-  mutation_controller = LineCommentingMutationController.new writer, tester
+  mutation_controller = LineCommentingMutationController.new writer, tester, working_folder
   code_file_reader = ReadableTextFile.new mutation_controller
   file_finder = RecursivelyFindCodeFilesInFolder.new File.join(golden_copy_path, code_to_mutate), mutation_controller, code_file_reader
   
   working_folder.reset
   baseline_test.test do |test_result|
     if test_result == :tests_failed
-      puts "Tests passed! FAILURE!"
+      puts "Baseline tests passed! FAILURE!"
     else
       file_finder.start
     end
   end
 end
-
-
-=begin
-  test_report = TestReport.new
-  working_folder = WorkingFolder.new golden_copy_path, working_folder_path
-  baseline_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
-  after_mutation_test = CodeUnderTest.new working_folder_path, solution_to_build, code_to_test, test_runner_path
-
-  working_folder.reset
-  baseline_test.test do |baseline_test_result|
-    case baseline_test_result
-    when :tests_passed then 
-      puts "Tests passed!"
-    when :tests_failed then 
-      test_report.baseline_test_failed
-    end
-  end
-=end
