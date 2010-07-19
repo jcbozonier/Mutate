@@ -1,8 +1,12 @@
-public class Foo
-{
 
-    public object GetTestedResult(bool p)
+namespace SampleCodeLibrary
+{
+    public class Foo
     {
-        return !p;
+
+        public object GetTestedResult(bool p)
+        {
+            return !p;
+        }
     }
 }
