@@ -16,7 +16,11 @@ class WorkingFolder
   end
   
   def reset
-    rm_rf @working_folder_path if File.directory? @working_folder_path
+    puts "resetting!"
+    
+    rm_r @working_folder_path if File.directory? @working_folder_path
+    puts (File.directory? @working_folder_path)
+    
     mkdir @working_folder_path
     cp_r @golden_copy_path + '\\.', @working_folder_path
   end
@@ -89,7 +93,7 @@ class LineCommentingMutationController
   
   def next text
     @line_counter += 1
-    if text.strip != ""
+    if text.strip != "" && !/^\/\//.match(text.strip())
       @writer.write(@file, @line_counter, "//" + text)
       @tester.next "#{@file}, #{@line_counter}, #{text}"
     end
@@ -122,7 +126,9 @@ class LineWriteableTextFile
 
   def write file_name, line_number, text  
     writeable_path = File.join(@root_path, file_name)
-    lines_of_text = File.open(writeable_path, 'r').readlines
+    readable_file = File.open(writeable_path, 'r')
+    lines_of_text = readable_file.readlines
+    readable_file.close
     writeable_file = File.new(writeable_path, 'w')
     
     current_line_number = 0
@@ -134,6 +140,8 @@ class LineWriteableTextFile
         writeable_file.puts line
       end
     end
+    
+    writeable_file.close
   end
 end
 
