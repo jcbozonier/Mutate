@@ -8,4 +8,8 @@ class FileSystem
   def exists? path
     File.exists? path
   end
+  
+  def glob search_pattern
+    yield Dir.glob(search_pattern)
+  end
 end

@@ -6,7 +6,7 @@ class NUnit
     @test_runner = test_runner_path
     @test_results_path = test_results_path
     @test_command = code_to_test
-    @file_system = FileSystem.new()
+    @file_system = FileSystem.new
     @system_call = SystemCall.new
   end
   

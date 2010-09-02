@@ -1,4 +1,5 @@
 require 'src/ShadowFolder'
+require 'src/FileSystem'
 require "StringIO"
 
 def mutate original_working_path, target_line_number, relative_file_path
@@ -30,25 +31,26 @@ def mutate original_working_path, target_line_number, relative_file_path
 end
 
 if __FILE__ == $0
-  folder = ShadowFolder.new 'C:\Code\MutationTesting\tests\test_project'
+  file_system = FileSystem.new
   
+  folder = ShadowFolder.new 'C:\Code\MutationTesting\tests\test_project'
   folder.shadow do |root_path|
     working_folder = File.join root_path, "SampleDotNetProject"
     search_pattern = File.join working_folder, "**", "*.cs"
-    mutatable_file_paths = Dir.glob(search_pattern)
-    
-    mutatable_file_paths.each{ |mutatable_file_path|
-      relative_mutatable_file_path = mutatable_file_path.sub(working_folder, '')
-      
-      file_line_number = 0
-      
-      opened_mutatable_file = File.open(mutatable_file_path)
-      opened_mutatable_file.each_line{ |mutatable_line|
-        file_line_number += 1        
-        mutate working_folder, file_line_number, relative_mutatable_file_path
+    file_system.glob(search_pattern) do |mutatable_file_paths|
+      mutatable_file_paths.each{ |mutatable_file_path|
+        relative_mutatable_file_path = mutatable_file_path.sub(working_folder, '')
+        
+        file_line_number = 0
+        
+        opened_mutatable_file = File.open(mutatable_file_path)
+        opened_mutatable_file.each_line{ |mutatable_line|
+          file_line_number += 1        
+          mutate working_folder, file_line_number, relative_mutatable_file_path
+        }
+        
+        opened_mutatable_file.close
       }
-      
-      opened_mutatable_file.close
-    }
+    end
   end
 end
