@@ -1,13 +1,12 @@
-require "tmpdir"
 require "StringIO"
 include FileUtils
-require "src/VisualStudio"
-require "src/NUnit"
+require "src/ProjectTest/VisualStudio"
+require "src/ProjectTest/NUnit"
 require "src/ShadowFolder"
-require "src/TestReport"
+require "src/ProjectTest/TestReport"
 
 if __FILE__ == $0
-  folder = ShadowFolder.new 'C:/ResearchTime/Mutate/tests/test_project'
+  folder = ShadowFolder.new 'C:\Code\MutationTesting\tests\test_project'
   
   folder.shadow do |root_path|
 	  solution_path = File.join root_path, 'SampleDotNetProject/SampleCodeLibrary/SampleCodeLibrary.sln'

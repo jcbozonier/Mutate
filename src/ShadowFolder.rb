@@ -1,3 +1,6 @@
+require "tmpdir"
+include FileUtils
+
 class ShadowFolder
   def initialize path_to_shadow
     @path_to_shadow = path_to_shadow
