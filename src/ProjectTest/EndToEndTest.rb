@@ -1,5 +1,3 @@
-require "StringIO"
-include FileUtils
 require "src/ProjectTest/VisualStudio"
 require "src/ProjectTest/NUnit"
 require "src/ShadowFolder"
@@ -10,11 +8,12 @@ if __FILE__ == $0
   
   folder.shadow do |root_path|
 	  solution_path = File.join root_path, 'SampleDotNetProject/SampleCodeLibrary/SampleCodeLibrary.sln'
-	  test_project_path = 'SampleDotNetProject/SampleCodeTests/SampleCodeTests.csproj'
-	  test_runner_path = 'NUnit_2.5.7_SampleInstall/bin/net-2.0/nunit-console.exe'
+	  test_project_path = File.join root_path, 'SampleDotNetProject/SampleCodeTests/SampleCodeTests.csproj'
+	  test_runner_path = File.join root_path, 'NUnit_2.5.7_SampleInstall/bin/net-2.0/nunit-console.exe'
+    test_results_path = File.join root_path, 'test_results.xml'
 	  
 	  visual_studio = VisualStudio.new(solution_path)
-	  nunit = NUnit.new(root_path, test_runner_path, test_project_path)
+	  nunit = NUnit.new(test_runner_path, test_project_path, test_results_path)
 	  test_report = TestReport.new
 	  
 	  test_report.compile_using visual_studio

@@ -11,11 +11,9 @@ class TestReport
   end
 
   def compilation_completed test_results
-	@compilation_completed = true
-	puts test_results
+    @compilation_completed = true
     @tests_passed = false if test_results.include? "FAILED"
-	
-	test_complete if @unit_tests_completed and @compilation_completed
+    test_complete if @unit_tests_completed and @compilation_completed
   end
 
   def compile_using compiler

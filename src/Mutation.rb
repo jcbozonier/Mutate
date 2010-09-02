@@ -38,10 +38,11 @@ if __FILE__ == $0
     mutatable_file_paths = Dir.glob(search_pattern)
     
     mutatable_file_paths.each{ |mutatable_file_path|
-      opened_mutatable_file = File.open(mutatable_file_path)
       relative_mutatable_file_path = mutatable_file_path.sub(working_folder, '')
       
       file_line_number = 0
+      
+      opened_mutatable_file = File.open(mutatable_file_path)
       opened_mutatable_file.each_line{ |mutatable_line|
         file_line_number += 1        
         mutate working_folder, file_line_number, relative_mutatable_file_path
