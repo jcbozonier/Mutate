@@ -1,13 +1,13 @@
 require "src/FileSystem"
-require "src/SystemCall"
+require "src/ProjectTest/SystemCall"
 
 class NUnit
-  def initialize test_runner_path, code_to_test, test_results_path
+  def initialize test_runner_path, code_to_test, test_results_path, system_call
     @test_runner = test_runner_path
     @test_results_path = test_results_path
     @test_command = code_to_test
     @file_system = FileSystem.new
-    @system_call = SystemCall.new
+    @system_call = system_call
   end
   
   def test    

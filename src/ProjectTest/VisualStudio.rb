@@ -1,8 +1,8 @@
 class VisualStudio
-  def initialize(solution_to_build) 
+  def initialize solution_to_build, system_call
     @compiler_path = 'C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\msbuild.exe'
     @build_path = solution_to_build
-    @system_call = SystemCall.new
+    @system_call = system_call
   end
   
   def compile

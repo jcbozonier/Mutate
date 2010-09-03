@@ -13,8 +13,9 @@ if __FILE__ == $0
     test_results_path = File.join root_path, 'test_results.xml'
 	  
     test_report = TestReport.new
-	  visual_studio = VisualStudio.new solution_path
-	  nunit = NUnit.new test_runner_path, test_project_path, test_results_path
+    system_call = SystemCall.new
+	  visual_studio = VisualStudio.new solution_path, system_call
+	  nunit = NUnit.new test_runner_path, test_project_path, test_results_path, system_call
 	  
 	  test_report.compile_using visual_studio
 	  test_report.unit_test_using nunit
