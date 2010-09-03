@@ -5,6 +5,20 @@ class FileSystem
     file.close
   end
   
+  def read_each_line file_path
+    target_file = File.open file_path
+    target_file.each_line{ |line|
+      yield line
+    }
+    target_file.close
+  end
+  
+  def write_all file_path, text_to_write
+    target_file = File.open(file_path, 'w')
+    target_file.write(text_to_write)
+    target_file.close
+  end
+  
   def exists? path
     File.exists? path
   end

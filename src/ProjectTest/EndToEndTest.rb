@@ -4,16 +4,16 @@ require "src/ShadowFolder"
 require "src/ProjectTest/TestReport"
 
 if __FILE__ == $0
-  folder = ShadowFolder.new 'C:\Code\MutationTesting\tests\test_project'
+  folder = ShadowFolder.new
   
-  folder.shadow do |root_path|
+  folder.shadow 'C:\Code\MutationTesting\tests\test_project' do |root_path|
 	  solution_path = File.join root_path, 'SampleDotNetProject/SampleCodeLibrary/SampleCodeLibrary.sln'
 	  test_project_path = File.join root_path, 'SampleDotNetProject/SampleCodeTests/SampleCodeTests.csproj'
 	  test_runner_path = File.join root_path, 'NUnit_2.5.7_SampleInstall/bin/net-2.0/nunit-console.exe'
     test_results_path = File.join root_path, 'test_results.xml'
 	  
-	  visual_studio = VisualStudio.new(solution_path)
-	  nunit = NUnit.new(test_runner_path, test_project_path, test_results_path)
+	  visual_studio = VisualStudio.new solution_path
+	  nunit = NUnit.new test_runner_path, test_project_path, test_results_path
 	  test_report = TestReport.new
 	  
 	  test_report.compile_using visual_studio
