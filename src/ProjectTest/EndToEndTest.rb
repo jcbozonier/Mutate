@@ -12,9 +12,9 @@ if __FILE__ == $0
 	  test_runner_path = File.join root_path, 'NUnit_2.5.7_SampleInstall/bin/net-2.0/nunit-console.exe'
     test_results_path = File.join root_path, 'test_results.xml'
 	  
+    test_report = TestReport.new
 	  visual_studio = VisualStudio.new solution_path
 	  nunit = NUnit.new test_runner_path, test_project_path, test_results_path
-	  test_report = TestReport.new
 	  
 	  test_report.compile_using visual_studio
 	  test_report.unit_test_using nunit
