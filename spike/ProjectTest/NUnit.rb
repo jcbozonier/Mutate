@@ -1,5 +1,5 @@
 require "src/FileSystem"
-require "src/ProjectTest/SystemCall"
+require "spike/ProjectTest/SystemCall"
 
 class NUnit
   def initialize test_runner_path, code_to_test, test_results_path, system_call

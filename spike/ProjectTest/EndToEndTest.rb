@@ -1,7 +1,7 @@
-require "src/ProjectTest/VisualStudio"
-require "src/ProjectTest/NUnit"
-require "src/ShadowFolder"
-require "src/ProjectTest/TestReport"
+require "spike/ProjectTest/VisualStudio"
+require "spike/ProjectTest/NUnit"
+require "spike/ShadowFolder"
+require "spike/ProjectTest/TestReport"
 
 if __FILE__ == $0
   folder = ShadowFolder.new
