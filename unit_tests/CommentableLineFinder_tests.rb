@@ -24,13 +24,14 @@ class CommentableLineFinder_Tests < Test::Unit::TestCase
   end
   
   def test_when_a_line_of_text_is_provided_to_the_finder
+    expected_root_path = 'root_path'
+    expected_relative_path = 'relative path'
+    expected_line_of_text = 'yada yada!'
+    
     commentable_line_finder_observer = TestCommentableLineFinderObserver.new
     commentable_line_finder = CommentableLineFinder.new
     commentable_line_finder.on_next_line_found_notify commentable_line_finder_observer
     
-    expected_root_path = 'root_path'
-    expected_relative_path = 'relative path'
-    expected_line_of_text = 'yada yada!'
     commentable_line_finder.next_file expected_root_path, expected_relative_path
     commentable_line_finder.next_line expected_line_of_text
     
