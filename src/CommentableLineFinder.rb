@@ -12,7 +12,9 @@ class CommentableLineFinder
     @current_line_number = 0 if @current_line_number.equal? nil
     @current_line_number += 1
     
-    @next_line_observer.next_line @current_line_number, @current_root_path, @current_relative_path, text
+    if not /^\s*\/\//.match(text)
+      @next_line_observer.next_line @current_line_number, @current_root_path, @current_relative_path, text
+    end
   end
   
   def for_file_system_access_use file_system

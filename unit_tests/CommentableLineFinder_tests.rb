@@ -41,15 +41,18 @@ class CommentableLineFinder_Tests < Test::Unit::TestCase
     assert_equal expected_line_of_text, commentable_line_finder_observer.current_line_of_text, 'should pass the correct line of text to the observer'
   end
   
-  def test_when_multiple_lines_of_text_are_provided_to_the_finder
+  def test_when_multiple_lines_of_commentable_and_uncommentable_text_are_provided_to_the_finder
+    line_count = 4
+    
     commentable_line_finder_observer = TestCommentableLineFinderObserver.new
     commentable_line_finder = CommentableLineFinder.new
     commentable_line_finder.on_next_line_found_notify commentable_line_finder_observer
     
     commentable_line_finder.next_line 'yada yada!'
     commentable_line_finder.next_line 'gfdgfdgfdg dgfd '
+    commentable_line_finder.next_line '// this is uncommentable and shouldnt be passed along'
     commentable_line_finder.next_line 'ftryytiu53'
     
-    assert_equal 3, commentable_line_finder_observer.current_line_number, 'should be passed to the observer with correct line number'
+    assert_equal line_count, commentable_line_finder_observer.current_line_number, 'the current line number should be the total line count'
   end
 end
