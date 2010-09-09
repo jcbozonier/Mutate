@@ -10,3 +10,4 @@ Milliman.MGAlfa.Packaging.dll
 *.rb~
 TestWorkingFolder
 mutation_report.txt
+*.ini
