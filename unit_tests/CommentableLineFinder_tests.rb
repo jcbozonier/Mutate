@@ -51,6 +51,7 @@ class CommentableLineFinder_Tests < Test::Unit::TestCase
     commentable_line_finder.next_line 'yada yada!'
     commentable_line_finder.next_line 'gfdgfdgfdg dgfd '
     commentable_line_finder.next_line '// this is uncommentable and shouldnt be passed along'
+    commentable_line_finder.next_line ' \t\r\n'
     commentable_line_finder.next_line 'ftryytiu53'
     
     assert_equal line_count, commentable_line_finder_observer.current_line_number, 'the current line number should be the total line count'

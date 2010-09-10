@@ -8,11 +8,10 @@ class CommentableLineFinder
     end
   end
   
-  def next_line text
-    @current_line_number = 0 if @current_line_number.equal? nil
-    @current_line_number += 1
-    
-    if not /^\s*\/\//.match(text)
+  def next_line text    
+    if not /^\s*\/\//.match(text) and text.strip != ''
+      @current_line_number = 0 if @current_line_number.equal? nil
+      @current_line_number += 1
       @next_line_observer.next_line @current_line_number, @current_root_path, @current_relative_path, text
     end
   end
