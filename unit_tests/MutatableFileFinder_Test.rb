@@ -5,8 +5,8 @@ require 'test/unit'
 require 'src/MutatableFileFinder'
 
 #Test Objects
-require 'unit_tests/TestObjects/TestFileSystem'
-require 'unit_tests/TestObjects/TestCommentableLineFinder'
+require 'unit_tests/TestObjects/FileSystem'
+require 'unit_tests/TestObjects/CommentableLineFinder'
 
 class MutatableFileFinder_Tests < Test::Unit::TestCase
   def test_when_searching_a_path

@@ -5,8 +5,8 @@ require 'test/unit'
 require 'src/CommentableLineFinder'
 
 #Test Objects
-require 'unit_tests/TestObjects/TestFileSystem'
-require 'unit_tests/TestObjects/TestCommentableLineFinderObserver'
+require 'unit_tests/TestObjects/FileSystem'
+require 'unit_tests/TestObjects/CommentableLineFinderObserver'
 
 class CommentableLineFinder_Tests < Test::Unit::TestCase
   def test_when_a_mutatable_file_is_found

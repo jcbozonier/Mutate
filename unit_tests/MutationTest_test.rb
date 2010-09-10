@@ -5,9 +5,9 @@ require 'test/unit'
 require 'src/MutationTest'
 
 #Test Objects
-require 'unit_tests/TestObjects/TestCompiler'
-require 'unit_tests/TestObjects/TestTestRunner'
-require 'unit_tests/TestObjects/TestResultSpy'
+require 'unit_tests/TestObjects/Compiler'
+require 'unit_tests/TestObjects/TestRunner'
+require 'unit_tests/TestObjects/TestResult'
 
 class Test_tests < Test::Unit::TestCase
   def setup
@@ -33,16 +33,6 @@ class Test_tests < Test::Unit::TestCase
     test_runner = TestTestRunner.new
     test = MutationTest.new
     test.on_unit_test_notify test_runner
-    
-    # smell: compilation does need to happen but I know
-    # which test project to run even if I don't compile.
-    # this means then that there's an implicit dependency
-    # on compilation before running the test runner.
-    # there should be a better way to get the test project
-    # path to the test runner without requiring an implicit
-    # dependency on compilation.
-    # I could just capture that information on an initialization
-    # method or during object construction.
     
     test.on_compile_notify TestCompiler.new
     
